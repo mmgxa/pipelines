@@ -16,12 +16,16 @@
 import os
 
 from .component import serialize_parameters
-from kfp import components
+if os.getenv('KOKORO_ROOT'):
+  from kfp import components
+else:
+  from kfp.v2 import components
 
 __all__ = [
     'HyperparameterTuningJobRunOp',
     'serialize_parameters',
 ]
+
 
 HyperparameterTuningJobRunOp = components.load_component_from_file(
     os.path.join(os.path.dirname(__file__), 'component.yaml'))
