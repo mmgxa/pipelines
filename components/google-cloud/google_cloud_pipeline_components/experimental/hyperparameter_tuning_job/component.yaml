@@ -138,9 +138,9 @@ inputs:
 - {name: location, type: String, default: 'us-central1', optional: true}
 - {name: study_spec_algorithm, type: String, default: 'ALGORITHM_UNSPECIFIED', optional: true}
 - {name: study_spec_measurement_selection_type, type: String, default: 'BEST_MEASUREMENT', optional: true}
-- {name: encryption_spec_key_name, type: String, optional: true}
-- {name: service_account, type: String, optional: true}
-- {name: network, type: String, optional: true}
+- {name: encryption_spec_key_name, type: String, optional: true, default: ''}
+- {name: service_account, type: String, optional: true, default: ''}
+- {name: network, type: String, optional: true, default: ''}
 outputs:
 - {name: gcp_resources, type: String}
 implementation:

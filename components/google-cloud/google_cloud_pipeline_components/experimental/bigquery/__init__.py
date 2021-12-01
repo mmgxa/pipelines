@@ -15,7 +15,7 @@
 
 import os
 
-from kfp.components import load_component_from_file
+from kfp.v2.components import load_component_from_file
 
 __all__ = [
     'BigqueryQueryJobOp',

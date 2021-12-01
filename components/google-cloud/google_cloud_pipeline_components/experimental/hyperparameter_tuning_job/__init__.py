@@ -16,7 +16,7 @@
 import os
 
 from .component import serialize_parameters
-from kfp import components
+from kfp.v2 import components
 
 __all__ = [
     'HyperparameterTuningJobRunOp',
