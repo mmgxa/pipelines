@@ -179,3 +179,35 @@ class LauncherBigqueryQueryJobUtilsTests(unittest.TestCase):
         job_configuration_query_override='{}',
         gcp_resources=self._gcp_resources,
         executor_input='executor_input')
+
+
+class LauncherBigqueryCreateModelUtilsTests(unittest.TestCase):
+
+  def setUp(self):
+    super(LauncherBigqueryCreateModelUtilsTests, self).setUp()
+    self._gcp_resources = os.path.join(
+        os.getenv('TEST_UNDECLARED_OUTPUTS_DIR'),
+        'test_file_path/test_file.txt')
+    self._input_args = [
+        '--type', 'BigqueryCreateModel', '--project', 'test_project',
+        '--location', 'us_central1', '--payload', 'test_payload',
+        '--job_configuration_query_override', '{}', '--gcp_resources',
+        self._gcp_resources, '--executor_input', 'executor_input'
+    ]
+
+  @mock.patch.object(
+      google_cloud_pipeline_components.google_cloud_pipeline_components
+      .container.experimental.gcp_launcher.bigquery_query_job_remote_runner,
+      'create_bigquery_model',
+      autospec=True)
+  def test_launcher_on_bigquery_query_job_type(
+      self, bigquery_query_job_remote_runner):
+    launcher.main(self._input_args)
+    bigquery_query_job_remote_runner.assert_called_once_with(
+        type='BigqueryCreateModel',
+        project='test_project',
+        location='us_central1',
+        payload='test_payload',
+        job_configuration_query_override='{}',
+        gcp_resources=self._gcp_resources,
+        executor_input='executor_input')

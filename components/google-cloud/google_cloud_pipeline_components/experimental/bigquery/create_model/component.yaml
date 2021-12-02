@@ -1,0 +1,74 @@
+# Copyright 2021 The Kubeflow Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: bigquery_create_model
+description: |
+  Launch a BigQuery create model job and waits for it to finish.
+
+    Args:
+        project (str):
+            Required. Project to create the BigQuery model in.
+        location (Optional[str]):
+            Location for creating the BigQuery model. If not set,
+            default to `US` multi-region.
+
+            For more details, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location
+        query (str):
+            Required. SQL query text to execute. Only standard SQL is supported.
+
+            If query are both specified in here and in job_configuration_query,
+            the value in here will override the other one.
+        job_configuration_query (Optional[dict]):
+            A json formatted string describing the rest of the job configuration.
+
+            For more details, see https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery
+    Returns:
+        model (google.BQMLModel):
+          Describes the model which is created.
+        gcp_resources (str):
+            Serialized gcp_resources proto tracking the BigQuery job.
+            For more details, see https://github.com/kubeflow/pipelines/blob/master/components/google-cloud/google_cloud_pipeline_components/proto/README.md.
+inputs:
+- {name: project, type: String}
+- {name: location, type: String, default: "us-central1"}
+- {name: query, type: String}
+- {name: job_configuration_query, type: JsonObject, optional: true, default: '{}'}
+outputs:
+- {name: model, type: google.BQMLModel}
+- {name: gcp_resources, type: String}
+implementation:
+  container:
+    image: gcr.io/ml-pipeline/google-cloud-pipeline-components:latest
+    command: [python3, -u, -m, google_cloud_pipeline_components.container.experimental.gcp_launcher.launcher]
+    args: [
+      --type, BigqueryCreateModel,
+      --project, {inputValue: project},
+      --location, {inputValue: location},
+      --payload,
+      concat: [
+          '{',
+            '"configuration": {',
+              '"query": ', {inputValue: job_configuration_query},
+            '}',
+          '}'
+      ],
+      --job_configuration_query_override,
+      concat: [
+          '{',
+            '"query": "', {inputValue: query}, '"',
+          '}'
+      ],
+      --gcp_resources, {outputPath: gcp_resources},
+      --executor_input, "{{$}}",
+    ]
